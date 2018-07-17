@@ -1,27 +1,11 @@
-//1 copy the google golang web-server example !done
-//2 create map element !done
-//2.1 map with structure !done
-//2.1 how to get data - by the url
-//2.3 q: how to name a key
-//3 add a life time to key
-//3.1  extend key lifetime when value is change
-//3.2  delete key when lifetime is end
-//4 add a fn that set a lifetime to key
-//5 add a fn that return a value by key
-//6 handle err of deleting null value key
-
-//---------------
-//timer for lifetime
-
-//---------------
-//how to detect a change - 
-
-//gorilla mux
+//split to packeges
 
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	// "fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"time"
@@ -33,12 +17,15 @@ import (
 
 //default lifetime value add to element o storage
 const stdlifetime int = 3
+const stdsleeptime time.Duration = 4
+
+// var extendLifetimeChannel chan string = make (chan string)
 
 //store the info about key-val thing
 type KeyValInfo struct {
-	Key      string
-	Value    string
-	LifeTime int
+	Key      string `json:"key"`
+	Value    string `json:"value"`
+	LifeTime int    `json:"life_time"`
 }
 
 var storage = make(map[string]*KeyValInfo)
@@ -46,10 +33,10 @@ var storage = make(map[string]*KeyValInfo)
 //substract the lifetime and delete zero lifetime KeyValInfo
 func lifetimeManage(storage map[string]*KeyValInfo) {
 	for {
-		time.Sleep(4 * time.Second)
+		time.Sleep(stdsleeptime * time.Second)
 		for _, s := range storage {
 			if s.LifeTime == 0 {
-				delete(storage, ""+s.Key)
+				delete(storage, s.Key)
 
 			} else {
 				s.LifeTime -= 1
@@ -64,19 +51,69 @@ func testStorageAdding() {
 	storage["3"] = &KeyValInfo{"3", "something new too", stdlifetime}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func extnedLifetimeFn(key string) {
+	storage[key].LifeTime += stdlifetime
+}
 
+func checkNewKeyUnique(k string) {
 	for _, s := range storage {
-		fmt.Fprintf(w, "%s %s %d\n", s.Key, s.Value, s.LifeTime)
+		if k == s.Key {
+			panic("New Key is not unique")
+		}
 	}
+}
+
+func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(storage)
+}
+
+func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	key := vars["key"]
+
+	json.NewEncoder(w).Encode(storage[key])
+}
+
+func handlerKeyChange(w http.ResponseWriter, r *http.Request) {
+	//dont foget to check newKey unique
+	vars := mux.Vars(r)
+	oldKey := vars["oldKey"]
+	newKey := vars["newKey"]
+
+	checkNewKeyUnique(newKey)
+
+	var oldValue *KeyValInfo = storage[oldKey]
+	delete(storage, oldKey)
+	oldValue.Key = newKey
+	storage[newKey] = oldValue
+
+	extnedLifetimeFn(newKey)
+}
+
+func handlerValueChange(w http.ResponseWriter, r *http.Request) {
+	//dont foget to check key exist
+	vars := mux.Vars(r)
+	key := vars["key"]
+	value := vars["value"]
+
+	storage[key].Value = value
+
+	extnedLifetimeFn(key)
 }
 
 func main() {
 
 	testStorageAdding()
 
+	r := mux.NewRouter()
+
+	r.HandleFunc("/all", handlerShowAllJsonByKey)
+	r.HandleFunc("/{key}", handlerShowJsonByKey)
+	r.HandleFunc("/changekey/{oldKey}/{newKey}", handlerKeyChange)
+	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
+
 	go lifetimeManage(storage)
 
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
