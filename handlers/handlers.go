@@ -1,27 +1,38 @@
 package handlers
 
+import s "practicegit/structs"
+import "net/http"
+import "encoding/json"
+import "github.com/gorilla/mux"
+import "log"
+
 const stdlifetime int = 3
 
-func testStorageAdding() {
-	storage["1"] = &KeyValInfo{"1", "something", stdlifetime}
-	storage["2"] = &KeyValInfo{"2", "something new", stdlifetime + 2}
-	storage["3"] = &KeyValInfo{"3", "something new too", stdlifetime}
+var Storage map[string]*s.KeyValInfo
+
+func extendLifetimeFn(key string) {
+	Storage[key].LifeTime += stdlifetime
 }
 
-func extnedLifetimeFn(key string) {
-	storage[key].LifeTime += stdlifetime
-}
-
-func checkNewKeyUnique(k string) {
-	for _, s := range storage {
+func isNewKeyUnique(k string) {
+	for _, s := range Storage {
 		if k == s.Key {
 			panic("New Key is not unique")
 		}
 	}
 }
 
+func isKeyExist(k string) bool {
+	for _, s := range Storage {
+		if k == s.Key {
+			return true
+		}
+	}
+	return false
+}
+
 func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(storage)
+	json.NewEncoder(w).Encode(Storage)
 }
 
 func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
@@ -29,32 +40,65 @@ func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
 
-	json.NewEncoder(w).Encode(storage[key])
+	isExist := isKeyExist(key)
+
+	if !isExist {
+		panic("this key doesn't exist")
+	}
+
+	json.NewEncoder(w).Encode(Storage[key])
 }
 
-func handlerKeyChange(w http.ResponseWriter, r *http.Request) {
+func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 	//dont foget to check newKey unique
 	vars := mux.Vars(r)
 	oldKey := vars["oldKey"]
 	newKey := vars["newKey"]
 
-	checkNewKeyUnique(newKey)
+	isNewKeyUnique(newKey)
+	if isKeyExist(oldKey) {
+		var oldValue *s.KeyValInfo = Storage[oldKey]
+		delete(Storage, oldKey)
+		oldValue.Key = newKey
+		Storage[newKey] = oldValue
+	} else {
+			Storage[oldKey] = &s.KeyValInfo{oldKey,"", stdlifetime}
+	}
 
-	var oldValue *KeyValInfo = storage[oldKey]
-	delete(storage, oldKey)
-	oldValue.Key = newKey
-	storage[newKey] = oldValue
-
-	extnedLifetimeFn(newKey)
+	extendLifetimeFn(newKey)
 }
 
-func handlerValueChange(w http.ResponseWriter, r *http.Request) {
-	//dont foget to check key exist
+func handlerValueChange(w http.ResponseWriter, r *http.Request) {	
 	vars := mux.Vars(r)
 	key := vars["key"]
 	value := vars["value"]
+	if isKeyExist(key) {
+		Storage[key].Value = value
+	 	extendLifetimeFn(key)
+	} else {
+	 	Storage[key] = &s.KeyValInfo{key,value,stdlifetime}
+	}
+}
 
-	storage[key].Value = value
+func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	key := vars["key"]
 
-	extnedLifetimeFn(key)
+	if Storage[key].Value == "" {
+		panic("Record doesn't have a value")
+	} else{
+		delete(Storage, key)	
+	}
+}
+
+func Handle() {
+	r := mux.NewRouter()
+
+	r.HandleFunc("/all", handlerShowAllJsonByKey)
+	r.HandleFunc("/{key}", handlerShowJsonByKey)
+	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerKeySet)
+	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
+	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
+
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
