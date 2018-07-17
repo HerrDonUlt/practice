@@ -1,6 +1,6 @@
 package handlers
 
-import s "practicegit/structs"
+import strt "practicegit/structs"
 import "net/http"
 import "encoding/json"
 import "github.com/gorilla/mux"
@@ -8,7 +8,7 @@ import "log"
 
 const stdlifetime int = 3
 
-var Storage map[string]*s.KeyValInfo
+var Storage map[string]*strt.KeyValInfo
 
 func extendLifetimeFn(key string) {
 	Storage[key].LifeTime += stdlifetime
@@ -57,12 +57,12 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 
 	isNewKeyUnique(newKey)
 	if isKeyExist(oldKey) {
-		var oldValue *s.KeyValInfo = Storage[oldKey]
+		var oldValue *strt.KeyValInfo = Storage[oldKey]
 		delete(Storage, oldKey)
 		oldValue.Key = newKey
 		Storage[newKey] = oldValue
 	} else {
-			Storage[oldKey] = &s.KeyValInfo{oldKey,"", stdlifetime}
+			Storage[oldKey] = &strt.KeyValInfo{oldKey,"", stdlifetime}
 	}
 
 	extendLifetimeFn(newKey)
@@ -76,7 +76,7 @@ func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 		Storage[key].Value = value
 	 	extendLifetimeFn(key)
 	} else {
-	 	Storage[key] = &s.KeyValInfo{key,value,stdlifetime}
+	 	Storage[key] = &strt.KeyValInfo{key,value,stdlifetime}
 	}
 }
 
