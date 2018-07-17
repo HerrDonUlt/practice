@@ -1,4 +1,4 @@
-package handlers
+ package handlers
 
 import s "practicegit/structs"
 import "net/http"
@@ -10,36 +10,38 @@ const stdlifetime int = 3
 
 var Storage map[string]*s.KeyValInfo
 
-func extendLifetimeFn(key string) {
-	Storage[key].LifeTime += stdlifetime
+type JsonErrMes struct {
+	ErrMessage string `json:"err_message`
 }
 
-func isNewKeyUnique(k string) {
-	for _, s := range Storage {
-		if k == s.Key {
-			panic("New Key is not unique")
-		}
-	}
+func (jem JsonErrMes) setErrMes(s string) {
+	jem.ErrMessage = s
 }
 
-func isKeyExist(k string) bool {
-	for _, s := range Storage {
-		if k == s.Key {
-			return true
-		}
-	}
-	return false
+func (jem JsonErrMes) encodeErrMes(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(jem.ErrMessage)
 }
+
+func (jem JsonErrMes) logErr(w http.ResponseWriter, k string) {
+	jem.setErrMes(k)
+	jem.endcodeErrMes(w)
+}
+
+//don't erase
+// s.setErrMes("New Key is not unique")
+// 			s.endcodeErrMes(w)
 
 func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(Storage)
 }
 
 func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	key := vars["key"]
 
+	for _, item := range Storage {
+		item.isKeyExist()
+	}
 	isExist := isKeyExist(key)
 
 	if !isExist {
