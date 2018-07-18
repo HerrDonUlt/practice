@@ -44,7 +44,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 		encodeAction(w, "New record set")
 	} else {
 		var oldValue *strt.KeyValInfo = Storage[oldKey]
-		delete(Storage, oldKey)
+		DeleteStorageRecord(oldKey)
 		oldValue.SetKey(newKey)
 		Storage[newKey] = oldValue
 		encodeAction(w, "Key set")
@@ -65,7 +65,7 @@ func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 
 		encodeAction(w, "New record set")
 	} else {
-		Storage[key].Value = value
+		Storage[key].SetValue(value)
 		AddLifetime(key)
 		encodeAction(w, "Value set")
 	}

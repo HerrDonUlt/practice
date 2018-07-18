@@ -48,6 +48,10 @@ func (kv KeyValInfo) SetKey(k string) {
 	kv.Key = k
 }
 
+func (kv KeyValInfo) SetValue(v string) {
+	kv.Value = v
+}
+
 func LifetimeManage(storage map[string]*KeyValInfo) {
 	for {
 		time.Sleep(sleeptimeInSec)
