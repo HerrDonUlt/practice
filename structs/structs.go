@@ -40,16 +40,6 @@ func (kv KeyValInfo) IsValueIn(k string) bool {
 	}	
 }
 
-func (kv *KeyValInfo) AddRecord(key string, value string) {
-	kv.Key = key
-	kv.Value = value
-	kv.AddLifetime(key)
-}
-
-func (kv *KeyValInfo) AddLifetime(key string) {
-	kv.LifeTime += stdlifetime
-}
-
 func (kv KeyValInfo) Delete(m map[string]*KeyValInfo, k string) {
 	delete(m, k)
 }
@@ -62,10 +52,8 @@ func LifetimeManage(storage map[string]*KeyValInfo) {
 	for {
 		time.Sleep(sleeptimeInSec)
 		for _, s := range storage {
-			isZero := s.IsZero()
-			if isZero {
+			if s.IsZero() {
 				s.Delete(storage, s.Key)
-
 			} else {
 				s.SubstructOne()
 			}

@@ -2,10 +2,20 @@ package handlers
 
 import strt "practicegit/structs"
 
+const stdlifetime int = 3
+
 var Storage map[string]*strt.KeyValInfo
 
-func extendLifetimeFn(s map[string]*strt.KeyValInfo, key string) {
-	s[key].AddLifetime(key)
+func AddStorageRecord(key string, value string) {
+	Storage[key] = &strt.KeyValInfo{key,value, stdlifetime}
+}
+
+func DeleteStorageRecord(key string) {
+	delete(Storage, key)
+}
+
+func AddLifetime(key string) {
+	Storage[key].LifeTime += stdlifetime
 }
 
 func isKeyExist(k string) string {

@@ -4,6 +4,7 @@ import strt "practicegit/structs"
 import "net/http"
 import "github.com/gorilla/mux"
 import "log"
+// import "fmt"
 
 func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
 	encodeAllRecords(w)	
@@ -20,6 +21,17 @@ func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handlerReturnValue(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	err := isKeyExist(vars["key"])
+	if err != "" {
+		encodeErr(w, err)
+	} else {
+		encodeValue(w, vars["key"])
+	}
+}
+
 func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	oldKey := vars["oldKey"]
@@ -27,7 +39,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 
 	err := isKeyExist(oldKey)
 	if err != "" {
-		Storage[newKey].AddRecord(oldKey, "")
+		AddStorageRecord(oldKey, "")
 		encodeAction(w, "New record set")
 	} else {
 		var oldValue *strt.KeyValInfo = Storage[oldKey]
@@ -37,7 +49,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 		encodeAction(w, "Key set")
 	}
 
-	extendLifetimeFn(Storage, newKey)
+	AddLifetime(newKey)
 }
 
 func handlerValueChange(w http.ResponseWriter, r *http.Request) {
@@ -48,11 +60,12 @@ func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 
 	err := isKeyExist(key)
 	if err != "" {		
-		Storage[key].AddRecord(key, value)
+		AddStorageRecord(key, value)
+		
 		encodeAction(w, "New record set")
 	} else {
 		Storage[key].Value = value
-		extendLifetimeFn(Storage, key)
+		AddLifetime(key)
 		encodeAction(w, "Value set")		
 	}
 }
@@ -64,12 +77,12 @@ func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 	if err != "" {
 		encodeErr(w, err)
 	} else {
-		delete(Storage, vars["key"])
+		DeleteStorageRecord(vars["key"])
 		encodeAction(w, "record with key:'" + vars["key"] + "' deleted")
 	}
 }
 
-func Handle() {
+func HandleLoop() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/all", handlerShowAllJsonByKey)
@@ -78,6 +91,7 @@ func Handle() {
 	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerKeySet)
 	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
 	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
+	r.HandleFunc("/value/{key}", handlerReturnValue)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

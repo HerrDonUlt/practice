@@ -17,9 +17,14 @@ func encodeAllRecords(w http.ResponseWriter) {
 	log.Println("show all records")
 }
 
-func encodeRecord(w http.ResponseWriter, k string) {
-	json.NewEncoder(w).Encode(Storage[k])
-	log.Println("show record with key:'" + k + "'")
+func encodeRecord(w http.ResponseWriter, s string) {
+	json.NewEncoder(w).Encode(Storage[s])
+	log.Println("show record with key:'" + s + "'")
+}
+
+func encodeValue(w http.ResponseWriter, s string) {
+	json.NewEncoder(w).Encode(JsonActMes{Storage[s].Value})
+	log.Println("Return value by key'" + s + "'")
 }
 
 func encodeErr(w http.ResponseWriter, s string) {
