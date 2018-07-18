@@ -29,7 +29,7 @@ func (kv KeyValInfo) IsKeyIn(k string) bool {
 		return true
 	} else {
 		return false
-	}	
+	}
 }
 
 func (kv KeyValInfo) IsValueIn(k string) bool {
@@ -37,7 +37,7 @@ func (kv KeyValInfo) IsValueIn(k string) bool {
 		return true
 	} else {
 		return false
-	}	
+	}
 }
 
 func (kv KeyValInfo) Delete(m map[string]*KeyValInfo, k string) {

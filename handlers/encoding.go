@@ -13,7 +13,7 @@ type JsonActMes struct {
 }
 
 func encodeAllRecords(w http.ResponseWriter) {
-	json.NewEncoder(w).Encode(Storage)	
+	json.NewEncoder(w).Encode(Storage)
 	log.Println("show all records")
 }
 
@@ -23,16 +23,16 @@ func encodeRecord(w http.ResponseWriter, s string) {
 }
 
 func encodeValue(w http.ResponseWriter, s string) {
-	json.NewEncoder(w).Encode(JsonActMes{Storage[s].Value})
+	json.NewEncoder(w).Encode(Storage[s].Value)
 	log.Println("Return value by key'" + s + "'")
 }
 
 func encodeErr(w http.ResponseWriter, s string) {
-	json.NewEncoder(w).Encode(JsonErrMes{s})	
+	json.NewEncoder(w).Encode(JsonErrMes{s})
 	log.Println(s)
 }
 
-func encodeAction( w http.ResponseWriter, s string) {
-	json.NewEncoder(w).Encode(JsonActMes{s})	
-	log.Println(s)	
+func encodeAction(w http.ResponseWriter, s string) {
+	json.NewEncoder(w).Encode(JsonActMes{s})
+	log.Println(s)
 }

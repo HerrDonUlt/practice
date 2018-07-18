@@ -1,11 +1,13 @@
 //incapsulation --im tried
 
 package main
+
 import (
 	hdlr "practicegit/handlers"
 	strt "practicegit/structs"
 	// "fmt"
 )
+
 var storage = make(map[string]*strt.KeyValInfo)
 
 //need auto testing

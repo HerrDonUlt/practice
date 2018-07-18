@@ -4,10 +4,11 @@ import strt "practicegit/structs"
 import "net/http"
 import "github.com/gorilla/mux"
 import "log"
+
 // import "fmt"
 
 func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
-	encodeAllRecords(w)	
+	encodeAllRecords(w)
 }
 
 func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +46,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 		var oldValue *strt.KeyValInfo = Storage[oldKey]
 		delete(Storage, oldKey)
 		oldValue.SetKey(newKey)
-		Storage[newKey] = oldValue		
+		Storage[newKey] = oldValue
 		encodeAction(w, "Key set")
 	}
 
@@ -59,14 +60,14 @@ func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 	value := vars["value"]
 
 	err := isKeyExist(key)
-	if err != "" {		
+	if err != "" {
 		AddStorageRecord(key, value)
-		
+
 		encodeAction(w, "New record set")
 	} else {
 		Storage[key].Value = value
 		AddLifetime(key)
-		encodeAction(w, "Value set")		
+		encodeAction(w, "Value set")
 	}
 }
 
@@ -78,7 +79,7 @@ func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 		encodeErr(w, err)
 	} else {
 		DeleteStorageRecord(vars["key"])
-		encodeAction(w, "record with key:'" + vars["key"] + "' deleted")
+		encodeAction(w, "record with key:'"+vars["key"]+"' deleted")
 	}
 }
 

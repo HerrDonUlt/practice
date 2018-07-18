@@ -7,7 +7,7 @@ const stdlifetime int = 3
 var Storage map[string]*strt.KeyValInfo
 
 func AddStorageRecord(key string, value string) {
-	Storage[key] = &strt.KeyValInfo{key,value, stdlifetime}
+	Storage[key] = &strt.KeyValInfo{key, value, stdlifetime}
 }
 
 func DeleteStorageRecord(key string) {
