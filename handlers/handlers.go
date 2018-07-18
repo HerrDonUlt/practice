@@ -1,38 +1,76 @@
 package handlers
 
-import strt "practicegit/structs"
+import strg "practicegit/storage"
 import "net/http"
 import "github.com/gorilla/mux"
 import "log"
+import "encoding/json"
 
-// import "fmt"
-
-func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
-	encodeAllRecords(w)
+type JsonMes struct {
+	Message string `json:"message"`
+	Writer http.ResponseWriter
+	Vars map[string]string
+	Existing bool	
+	KeyError string
+	ValueError string 
 }
 
-func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+var mesArr JsonMes
 
-	err := isKeyExist(vars["key"])
-	if err != "" {
-		encodeErr(w, err)
+func Init(){
+	mesArr.KeyError = "The key doesn't exist"
+	mesArr.ValueError = "Record doesn't have the value"
+}
+
+func (jm JsonMes) wrap(w http.ResponseWriter, s string) {
+	jm.Message = s
+	jm.Writer = w
+}
+
+func (jm JsonMes) encode() {
+	json.NewEncoder(jm.Writer).Encode(jm.Message)
+}
+
+func (jm JsonMes) log() {
+	log.Println(jm.Message)
+}
+
+func (jm JsonMes) encodeMessage(w http.ResponseWriter, s string) {
+	jm.wrap(w, s)
+	jm.encode()
+	jm.log()
+}
+
+func (jm JsonMes) getVars(r *http.Request) {
+	jm.Vars = mux.Vars(r)
+}
+
+func (jm JsonMes) getExisting(s string) {
+	//"this key doesn't exist"
+	jm.Existing = strg.IsKeyExist(jm.Vars[s])
+}
+
+func (jm JsonMes) sendFinalMessage(s string) {
+	if jm.Existing {
+		jm.encodeMessage(jm.Writer, jm.KeyError)
 	} else {
-		encodeRecord(w, vars["key"])
+		jm.encodeMessage(jm.Writer, jm.Vars[s])
 	}
+}
+
+func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
+	mesArr.getVars(r)
+	mesArr.getExisting("key")	
+	mesArr.sendFinalMessage("key")//w
 }
 
 func handlerReturnValue(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	err := isKeyExist(vars["key"])
-	if err != "" {
-		encodeErr(w, err)
-	} else {
-		encodeValue(w, vars["key"])
-	}
+	mesArr.getVars(r)
+	mesArr.getExisting("value")
+	mesArr.sendFinalMessage("value")
 }
 
+//re
 func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	oldKey := vars["oldKey"]
@@ -43,7 +81,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 		AddStorageRecord(oldKey, "")
 		encodeAction(w, "New record set")
 	} else {
-		var oldValue *strt.KeyValInfo = Storage[oldKey]
+		var oldValue *strg.KeyValInfo = Storage[oldKey]
 		DeleteStorageRecord(oldKey)
 		oldValue.SetKey(newKey)
 		Storage[newKey] = oldValue
@@ -53,6 +91,7 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 	AddLifetime(newKey)
 }
 
+//re
 func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 	//need re
 	vars := mux.Vars(r)
@@ -71,6 +110,7 @@ func handlerValueChange(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//re
 func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

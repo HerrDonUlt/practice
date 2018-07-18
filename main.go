@@ -1,27 +1,19 @@
 //incapsulation --im tried
+//incapsulation
+//golang race
+//postman
 
 package main
 
 import (
 	hdlr "practicegit/handlers"
-	strt "practicegit/structs"
+	strg "practicegit/storage"
 	// "fmt"
 )
 
-var storage = make(map[string]*strt.KeyValInfo)
-
-//need auto testing
-func testStorageAdding() {
-	hdlr.AddStorageRecord("1", "something")
-	hdlr.AddStorageRecord("2", "something new")
-	hdlr.AddStorageRecord("3", "")
-}
-
 func main() {
 
-	hdlr.Storage = storage
-
 	testStorageAdding()
-	go strt.LifetimeManage(storage)
+	go strg.LifetimeManage()
 	hdlr.HandleLoop()
 }
