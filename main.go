@@ -5,16 +5,17 @@ package main
 import (
 	hdlr "practicegit/handlers"
 	strt "practicegit/structs"
-	"time"
+	"fmt"
 )
 
 const stdlifetime int = 3
 
 //need auto testing
 func testStorageAdding(stg map[string]*strt.KeyValInfo) {
-	stg["1"] = &strt.KeyValInfo{"1", "something", stdlifetime}
-	stg["2"] = &strt.KeyValInfo{"2", "something new", stdlifetime + 2}
-	stg["3"] = &strt.KeyValInfo{"3", "", stdlifetime}
+	stg["1"] = &strt.KeyValInfo{"1", "something", 10 }
+	// stg["1"].AddRecord("1", "something")
+	// stg["2"].AddRecord("2", "something new")
+	// stg["3"].AddRecord("3", "")
 }
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 
 	testStorageAdding(storage)
 	go strt.LifetimeManage(storage)
+	// fmt.Println(storage["1"])
 
 	hdlr.Handle()
 }
