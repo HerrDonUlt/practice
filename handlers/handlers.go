@@ -1,106 +1,139 @@
- package handlers
+package handlers
 
-import s "practicegit/structs"
+import strg "practicegit/storage"
 import "net/http"
-import "encoding/json"
 import "github.com/gorilla/mux"
 import "log"
+import "encoding/json"
 
-const stdlifetime int = 3
-
-var Storage map[string]*s.KeyValInfo
-
-type JsonErrMes struct {
-	ErrMessage string `json:"err_message`
+type JsonMes struct {
+	Message string `json:"message"`
+	Writer http.ResponseWriter
+	Vars map[string]string
+	KeyExisting bool	
+	ValueExisting bool
+	Error error
 }
 
-func (jem JsonErrMes) setErrMes(s string) {
-	jem.ErrMessage = s
+var mesArr JsonMes
+
+func Init(){
+	mesArr.KeyError = 
+	mesArr.ValueError = 
 }
 
-func (jem JsonErrMes) encodeErrMes(w http.ResponseWriter) {
-	json.NewEncoder(w).Encode(jem.ErrMessage)
+func (jm JsonMes) wrap(w http.ResponseWriter, s string) {
+	jm.Message = s
+	jm.Writer = w
 }
 
-func (jem JsonErrMes) logErr(w http.ResponseWriter, k string) {
-	jem.setErrMes(k)
-	jem.endcodeErrMes(w)
+func (jm JsonMes) encode() {
+	json.NewEncoder(jm.Writer).Encode(jm.Message)
 }
 
-//don't erase
-// s.setErrMes("New Key is not unique")
-// 			s.endcodeErrMes(w)
-
-func handlerShowAllJsonByKey(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(Storage)
+func (jm JsonMes) log() {
+	log.Println(jm.Message)
 }
 
-func handlerShowJsonByKey(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["key"]
-
-	for _, item := range Storage {
-		item.isKeyExist()
-	}
-	isExist := isKeyExist(key)
-
-	if !isExist {
-		panic("this key doesn't exist")
-	}
-
-	json.NewEncoder(w).Encode(Storage[key])
+func (jm JsonMes) encodeMessage(w http.ResponseWriter, s string) {
+	jm.wrap(w, s)
+	jm.encode()
+	jm.log()
 }
 
-func handlerKeySet(w http.ResponseWriter, r *http.Request) {
-	//dont foget to check newKey unique
-	vars := mux.Vars(r)
-	oldKey := vars["oldKey"]
-	newKey := vars["newKey"]
+func (jm JsonMes) getVars(r *http.Request) {
+	jm.Vars = mux.Vars(r)
+}
 
-	isNewKeyUnique(newKey)
-	if isKeyExist(oldKey) {
-		var oldValue *s.KeyValInfo = Storage[oldKey]
-		delete(Storage, oldKey)
-		oldValue.Key = newKey
-		Storage[newKey] = oldValue
+func (jm JsonMes) getExisting(s string) {
+	jm.KeyExisting = strg.IsExist(jm.Vars[s])
+}
+
+func (jm JsonMes) sendFinalMessage(s string) {
+	if jm.Existing {
+		//when error
+		jm.encodeMessage(jm.Writer, jm.Error)
 	} else {
-			Storage[oldKey] = &s.KeyValInfo{oldKey,"", stdlifetime}
+		jm.encodeMessage(jm.Writer, jm.Vars[s])
 	}
-
-	extendLifetimeFn(newKey)
 }
 
-func handlerValueChange(w http.ResponseWriter, r *http.Request) {	
+func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
+	mesArr.getVars(r)
+	mesArr.getKeyExisting("key")
+	mesArr.sendFinalMessage("key")//w
+}
+
+func handlerReturnValue(w http.ResponseWriter, r *http.Request) {
+	mesArr.getVars(r)
+	mesArr.getValueExisting("value")
+	mesArr.sendFinalMessage("value")
+}
+
+//re
+func handlerKeySet(w http.ResponseWriter, r *http.Request) {
+	mesArr.getVars(r)
+	mesArr.getKeyExisting("oldKey")
+
+
+
+	err := isKeyExist(oldKey)
+	if err != "" {
+		AddStorageRecord(oldKey, "")
+		encodeAction(w, "New record set")
+	} else {
+		var oldValue *strg.KeyValInfo = Storage[oldKey]
+		DeleteStorageRecord(oldKey)
+		oldValue.SetKey(newKey)
+		Storage[newKey] = oldValue
+		encodeAction(w, "Key set")
+	}
+
+	AddLifetime(newKey)
+}
+
+//re
+func handlerValueChange(w http.ResponseWriter, r *http.Request) {
+	//need re
 	vars := mux.Vars(r)
 	key := vars["key"]
 	value := vars["value"]
-	if isKeyExist(key) {
-		Storage[key].Value = value
-	 	extendLifetimeFn(key)
+
+	err := isKeyExist(key)
+	if err != "" {
+		AddStorageRecord(key, value)
+
+		encodeAction(w, "New record set")
 	} else {
-	 	Storage[key] = &s.KeyValInfo{key,value,stdlifetime}
+		Storage[key].SetValue(value)
+		AddLifetime(key)
+		encodeAction(w, "Value set")
 	}
 }
 
+//re
 func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	key := vars["key"]
 
-	if Storage[key].Value == "" {
-		panic("Record doesn't have a value")
-	} else{
-		delete(Storage, key)	
+	err := isValueExist(vars["key"])
+	if err != "" {
+		encodeErr(w, err)
+	} else {
+		DeleteStorageRecord(vars["key"])
+		encodeAction(w, "record with key:'"+vars["key"]+"' deleted")
 	}
 }
 
-func Handle() {
+func HandleLoop() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/all", handlerShowAllJsonByKey)
 	r.HandleFunc("/{key}", handlerShowJsonByKey)
+
 	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerKeySet)
 	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
 	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
+	r.HandleFunc("/value/{key}", handlerReturnValue)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
