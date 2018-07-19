@@ -1,7 +1,5 @@
 package storage
 
-
-
 var storage = make(map[string]*Storage)
 
 //store the info about key-val thing
@@ -11,50 +9,46 @@ type Storage struct {
 	LifeTime int    `json:"life_time"`
 }
 
-func (kv *Storage) SubstructOne() {
-	kv.LifeTime -= 1
+func (s *Storage) substructOne() {
+	s.LifeTime -= 1
 }
 
-func (kv Storage) IsZero() bool {
-	if kv.LifeTime == 0 {
+func (s Storage) isZero() bool {
+	if s.LifeTime == 0 {
 		return true
 	} else {
 		return false
 	}
 }
 
-func (kv Storage) IsKeyIn(k string) bool {
-	if kv.Key == k {
+func (s Storage) isKeyIn(k string) bool {
+	if s.Key == k {
 		return true
 	} else {
 		return false
 	}
 }
 
-func (kv Storage) IsValueIn(k string) bool {
-	if kv.Key == k && kv.Value != "" {
+func (s Storage) isValueIn(k string) bool {
+	if s.Key == k && s.Value != "" {
 		return true
 	} else {
 		return false
 	}
 }
 
-func (kv Storage) Delete(k string) {
-	delete(storage, k)
+// func (s Storage) delete(k string) {
+// 	delete(storage, k)
+// }
+
+func (s *Storage) setKey(k string) {
+	s.Key = k
 }
 
-func (kv *Storage) SetKey(k string) {
-	kv.Key = k
+func (s *Storage) setValue(v string) {
+	s.Value = v
 }
 
-func (kv *Storage) SetValue(v string) {
-	kv.Value = v
-}
-
-func (kv *Storage) AddStorageRecord(k string, v string) {
-	storage[k] = &Storage{k, v, stdlifetime}
-}
-
-func (kv *Storage) AddLifetime(k string) {
-	storage[k].LifeTime += stdlifetime
+func (s *Storage) addLifetime() {
+	s.LifeTime += stdlifetime
 }

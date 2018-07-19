@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	testStorageAdding()
+	strg.TestStorageAdding()
 	go strg.LifetimeManage()
 	hdlr.HandleLoop()
 }

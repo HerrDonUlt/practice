@@ -5,134 +5,79 @@ import "net/http"
 import "github.com/gorilla/mux"
 import "log"
 import "encoding/json"
+import "errors"
+
+type ErrMsg struct {
+	Message error `json:"error_message"`
+}
+type ActMsg struct {
+	Message string `json:"action_message"`
+}
 
 type JsonMes struct {
-	Message string `json:"message"`
-	Writer http.ResponseWriter
+	ErrMessage ErrMsg
+	ActMessage ActMsg
 	Vars map[string]string
-	Existing bool	
-	KeyError string
-	ValueError string 
+	Existing bool
+	Error error
 }
 
 var mesArr JsonMes
 
-func Init(){
-	mesArr.KeyError = "The key doesn't exist"
-	mesArr.ValueError = "Record doesn't have the value"
+func (jm *JsonMes) setErr(s string) {
+	jm.ErrMessage.Message = errors.New(s)
 }
 
-func (jm JsonMes) wrap(w http.ResponseWriter, s string) {
-	jm.Message = s
-	jm.Writer = w
+func (jm *JsonMes) setMes(s string) {
+	jm.ActMessage.Message = s
 }
 
-func (jm JsonMes) encode() {
-	json.NewEncoder(jm.Writer).Encode(jm.Message)
+func (jm JsonMes) encodeErr(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(jm.ErrMessage)
 }
 
-func (jm JsonMes) log() {
-	log.Println(jm.Message)
+func (jm JsonMes) encodeRecord(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(strg.ReturnStorageRecord(jm.Vars["key"]))
 }
 
-func (jm JsonMes) encodeMessage(w http.ResponseWriter, s string) {
-	jm.wrap(w, s)
-	jm.encode()
-	jm.log()
+func (jm JsonMes) encodeAllRecords(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(strg.ReturnStorage())
 }
 
-func (jm JsonMes) getVars(r *http.Request) {
+func (jm JsonMes) encodeValue(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(strg.ReturnValueRecord(jm.Vars["key"]))
+}
+
+func (jm JsonMes) encodeMes(w http.ResponseWriter) {
+	json.NewEncoder(w).Encode(jm.ActMessage)
+}
+
+func (jm JsonMes) logErr() {
+	log.Println(jm.ErrMessage)
+}
+
+func (jm JsonMes) logMes() {
+	log.Println(jm.ActMessage)
+}
+
+func (jm *JsonMes) getVars(r *http.Request) {
 	jm.Vars = mux.Vars(r)
 }
 
 func (jm JsonMes) getExisting(s string) {
-	//"this key doesn't exist"
-	jm.Existing = strg.IsKeyExist(jm.Vars[s])
-}
-
-func (jm JsonMes) sendFinalMessage(s string) {
-	if jm.Existing {
-		jm.encodeMessage(jm.Writer, jm.KeyError)
-	} else {
-		jm.encodeMessage(jm.Writer, jm.Vars[s])
-	}
-}
-
-func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
-	mesArr.getVars(r)
-	mesArr.getExisting("key")	
-	mesArr.sendFinalMessage("key")//w
-}
-
-func handlerReturnValue(w http.ResponseWriter, r *http.Request) {
-	mesArr.getVars(r)
-	mesArr.getExisting("value")
-	mesArr.sendFinalMessage("value")
-}
-
-//re
-func handlerKeySet(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	oldKey := vars["oldKey"]
-	newKey := vars["newKey"]
-
-	err := isKeyExist(oldKey)
-	if err != "" {
-		AddStorageRecord(oldKey, "")
-		encodeAction(w, "New record set")
-	} else {
-		var oldValue *strg.KeyValInfo = Storage[oldKey]
-		DeleteStorageRecord(oldKey)
-		oldValue.SetKey(newKey)
-		Storage[newKey] = oldValue
-		encodeAction(w, "Key set")
-	}
-
-	AddLifetime(newKey)
-}
-
-//re
-func handlerValueChange(w http.ResponseWriter, r *http.Request) {
-	//need re
-	vars := mux.Vars(r)
-	key := vars["key"]
-	value := vars["value"]
-
-	err := isKeyExist(key)
-	if err != "" {
-		AddStorageRecord(key, value)
-
-		encodeAction(w, "New record set")
-	} else {
-		Storage[key].SetValue(value)
-		AddLifetime(key)
-		encodeAction(w, "Value set")
-	}
-}
-
-//re
-func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	err := isValueExist(vars["key"])
-	if err != "" {
-		encodeErr(w, err)
-	} else {
-		DeleteStorageRecord(vars["key"])
-		encodeAction(w, "record with key:'"+vars["key"]+"' deleted")
-	}
+	jm.Existing, jm.Error = strg.IsExist(s, jm.Vars["key"])
 }
 
 func HandleLoop() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/all", handlerShowAllJsonByKey)
-	r.HandleFunc("/{key}", handlerShowJsonByKey)
+	r.HandleFunc("/all", handlerShowAllRecords)
+	r.HandleFunc("/{key}", handlerShowRecord)
 
 	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerKeySet)
 	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
 	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
-	r.HandleFunc("/value/{key}", handlerReturnValue)
+	r.HandleFunc("/value/{key}", handlerShowValue)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
