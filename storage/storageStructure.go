@@ -4,16 +4,11 @@ import "sync"
 
 var storage = make(map[string]*Storage)
 
-type Record struct {
-	sync.Mutex
-	Key      string `json:"key"`
-	Value    string `json:"value"`
-}
-
 //store the info about key-val thing
 type Storage struct {
 	sync.Mutex
-	Record    Record
+	Key      string `json:"key"`
+	Value    string `json:"value"`
 	LifeTime int    `json:"life_time"`
 }
 
@@ -32,34 +27,34 @@ func (s Storage) isLifetimeZero() bool {
 	return false
 }
 
-func (p Record) isKeyIn(k string) bool {
-	p.Lock()
-	defer p.Unlock()
-	if p.Key == k {
+func (s Storage) isKeyIn(k string) bool {
+	s.Lock()
+	defer s.Unlock()
+	if s.Key == k {
 		return true
 	}
 	return false
 }
 
-func (p Record) isValueIn(k string) bool {
-	p.Lock()
-	defer p.Unlock()
-	if p.Key == k && p.Value != "" {
+func (s Storage) isValueIn(k string) bool {
+	s.Lock()
+	defer s.Unlock()
+	if s.Key == k && s.Value != "" {
 		return true
 	}
 	return false
 }
 
-func (p *Record) setKey(k string) {
-	p.Lock()
-	defer p.Unlock()
-	p.Key = k
+func (s *Storage) setKey(k string) {
+	s.Lock()
+	defer s.Unlock()
+	s.Key = k
 }
 
-func (p *Record) setValue(v string) {
-	p.Lock()
-	defer p.Unlock()
-	p.Value = v
+func (s *Storage) setValue(v string) {
+	s.Lock()
+	defer s.Unlock()
+	s.Value = v
 }
 
 func (s *Storage) addRecordLifetime() {

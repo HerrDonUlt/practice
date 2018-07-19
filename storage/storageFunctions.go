@@ -3,21 +3,24 @@ package storage
 import "time"
 import (
 	"errors"
+	"sync"
 )
 
 const sleeptimeInSec time.Duration = 4 * time.Second
 const stdlifetime int = 3
 
 func TestStorageAdding() {
-	storage["1"].Record.setKey("1")
-	storage["1"].Record.setValue("something")
-	storage["1"].addRecordLifetime()
+	s.Lock()
+	defer s.Unlock()
+	storage["1"] = &Storage{sync.Mutex{}, "1", "something", stdlifetime}
 }
 
 //t must be key, or value
 func IsKeyExist(key string) error {
+	s.Lock()
+	defer s.Unlock()
 	for _, s := range storage {
-		if s.Record.isKeyIn(key) {
+		if s.isKeyIn(key) {
 			return nil
 		}
 	}
@@ -25,8 +28,10 @@ func IsKeyExist(key string) error {
 }
 
 func IsValueExist(key string) error {
+	s.Lock()
+	defer s.Unlock()
 	for _, s := range storage {
-		if s.Record.isValueIn(key) {
+		if s.isValueIn(key) {
 			return nil
 		}
 	}
@@ -38,7 +43,7 @@ func LifetimeManage() {
 		time.Sleep(sleeptimeInSec)
 		for _, s := range storage {
 			if s.isLifetimeZero() {
-				DeleteStorageRecord(s.Record.Key)
+				DeleteStorageRecord(s.Key)
 			} else {
 				s.substructLifetimeOne()
 			}
@@ -51,8 +56,8 @@ func AddStorageRecord(key, value string) error {
 	if err != nil {
 		return errors.New("Record doesn't added (key isn't unique)")
 	}
-	storage[key].Record.setKey(key)
-	storage[key].Record.setValue(value)
+	storage[key].setKey(key)
+	storage[key].setValue(value)
 	storage[key].addRecordLifetime()
 	return nil
 }
@@ -66,11 +71,11 @@ func ReturnStorageRecord(key string) *Storage {
 }
 
 func ReturnRecordKey(key string) string {
-	return storage[key].Record.Key
+	return storage[key].Key
 }
 
 func ReturnRecordValue(key string) string {
-	return storage[key].Record.Value
+	return storage[key].Value
 }
 
 func DeleteStorageRecord(key string) {
@@ -88,7 +93,7 @@ func ChangeRecordKey(oldKey, newKey string) error {
 }
 
 func ChangeRecordValue(key, value string) {
-	storage[key].Record.setValue(value)
+	storage[key].setValue(value)
 	storage[key].addRecordLifetime()
 }
 
