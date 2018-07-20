@@ -1,27 +1,17 @@
-package handlers
+package main
 
 import strg "practicegit/storage"
 import (
 	"net/http"
 	"log"
     "github.com/gorilla/mux"
+	"encoding/json"
 )
 
-//logging
-
 func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
-	var encoder Encoder
 	vars := mux.Vars(r)
-	err := strg.IsKeyExistReturnErr(vars["key"])
-	if err != nil {
-		encoder.setError("Key is not exist")
-		encoder.encodeError(w)
-		log.Println(encoder.ErrMessage)
-		return
-	}
-	encoder.setMessage("Record " + vars["key"] + " showed")
-	encoder.encodeRecord(w, vars["key"])
-	log.Println(encoder.ActMessage)
+	json.NewEncoder(w).Encode(vars["key"])
+	log.Println("Record " + vars["key"] + " showed")
 }
 
 ////re
