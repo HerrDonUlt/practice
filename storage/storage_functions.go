@@ -1,6 +1,8 @@
 package storage
 
-import "time"
+import (
+	"time"
+)
 
 const sleeptimeInSec time.Duration = 4 * time.Second
 
@@ -11,7 +13,7 @@ func initTestStorage(s *Storage) {
 }
 
 func NewStorage() *Storage {
-	s := &Storage {records: make(map[string]*Record)}
+	s := &Storage{records: make(map[string]*Record)}
 	initTestStorage(s)
 	go LifetimeManage(s)
 	return s
@@ -21,10 +23,13 @@ func LifetimeManage(storage *Storage) {
 	for {
 		time.Sleep(sleeptimeInSec)
 		for _, s := range storage.records {
-			s.
-			if IsLifetimeZero(s.getRecordKey()) {
-				DeleteStorageRecord(s.getRecordKey())
+			if s.IsRecordLifetimeZero() {
+				storage.DeleteStorageRecord(s)
 			}
 		}
 	}
+}
+
+func IsKeyInStorage(storage *Storage, key string) bool {
+	return storage.IsKeyInStorage(key)
 }

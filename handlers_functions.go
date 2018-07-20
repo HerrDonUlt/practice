@@ -1,14 +1,14 @@
 package main
 
-import strg "practicegit/storage"
 import (
-	"net/http"
-	"log"
-    "github.com/gorilla/mux"
 	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
+func HandlerShowRecord(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	json.NewEncoder(w).Encode(vars["key"])
 	log.Println("Record " + vars["key"] + " showed")
@@ -20,26 +20,18 @@ func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
 //
 //}
 
-func handlerShowValue(w http.ResponseWriter, r *http.Request) {
-	var encoder Encoder
+func HandlerShowValue(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	err := strg.IsValueNotNullReturnErr(vars["key"])
-	if err != nil {
-		encoder.setError("Value is not exist")
-		encoder.encodeValue(w, vars["value"])
-		log.Println(encoder.ErrMessage)
-		return
-	}
-	encoder.setMessage("Value " + vars["key"] + " showed")
-	encoder.encodeMessage(w)
-	log.Println(encoder.ActMessage)
+	json.NewEncoder(w).Encode(vars["value"])
+	log.Println("Value " + vars["key"] + " showed")
 }
 
 //re
-func handlerSetKey(w http.ResponseWriter, r *http.Request) {
-	var encoder Encoder
+func HandlerSetKey(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	err := strg.IsKeyExistReturnErr("oldKey")
+	if strg.IsKeyInStorage(vars["key"]) {
+
+	}
 	if err != nil {
 		strg.AddStorageRecord(vars["oldKey"], "")
 		encoder.setMessage("New record seted")
@@ -60,7 +52,7 @@ func handlerSetKey(w http.ResponseWriter, r *http.Request) {
 	log.Println(encoder.ActMessage)
 }
 
-func handlerChangeValue(w http.ResponseWriter, r *http.Request) {
+func HandlerChangeValue(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
 
@@ -78,7 +70,7 @@ func handlerChangeValue(w http.ResponseWriter, r *http.Request) {
 }
 
 //re
-func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
+func HandlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
 

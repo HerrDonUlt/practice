@@ -3,13 +3,13 @@ package storage
 import "sync"
 
 type Record struct {
-	Key string `json:"key"`
-	Value string `json:"value"`
+	Key      string `json:"key"`
+	Value    string `json:"value"`
 	LifeTime int    `json:"life_time"`
 }
 
 type Storage struct {
-	mux sync.RWMutex
+	mux     sync.RWMutex
 	records map[string]*Record
 }
 
@@ -44,12 +44,23 @@ func (s *Storage) SetRecord(key, value string) {
 	s.records[key].Value = value
 }
 
-func (r *Record) GetRecordValue(key string) string {
+func (r *Record) GetRecordValue() string {
 	return r.Value
 }
 
-func (s *Storage) SubstructLifeTimeOne(key string) {
+func (r *Record) IsRecordLifetimeZero() bool {
+	if r.LifeTime == 0 {
+		return true
+	}
+	return false
+}
+
+func (s *Storage) SubstructLifetimeOne(key string) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	s.records[key].LifeTime -= 1
+}
+
+func (s *Storage) DeleteStorageRecord(r *Record) {
+	delete(s.records, r.Key)
 }

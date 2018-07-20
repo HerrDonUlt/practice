@@ -1,12 +1,12 @@
 package main
 
 import (
-	hdlr "practicegit/handlers"
 	strg "practicegit/storage"
 
-	"github.com/gorilla/mux"
-	"net/http"
 	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -15,12 +15,12 @@ func main() {
 	r := mux.NewRouter()
 
 	//r.HandleFunc("/all", handlerShowAllRecords)
-	r.HandleFunc("/{key}", handlerShowRecord)
+	r.HandleFunc("/{key}", HandlerShowRecord)
 
-	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerSetKey)
-	r.HandleFunc("/changevalue/{key}/{value}", handlerChangeValue)
-	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
-	r.HandleFunc("/value/{key}", handlerShowValue)
+	r.HandleFunc("/setkey/{oldKey}/{newKey}", HandlerSetKey)
+	r.HandleFunc("/changevalue/{key}/{value}", HandlerChangeValue)
+	r.HandleFunc("/delete/{key}", HandlerDeleteRecord)
+	r.HandleFunc("/value/{key}", HandlerShowValue)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 
