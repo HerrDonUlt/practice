@@ -1,102 +1,114 @@
 package storage
 
-import "time"
 import (
 	"errors"
-	"sync"
+	"time"
 )
 
 const sleeptimeInSec time.Duration = 4 * time.Second
-const stdlifetime int = 3
+
+var storage = NewStorage()
 
 func TestStorageAdding() {
-	s.Lock()
-	defer s.Unlock()
-	storage["1"] = &Storage{sync.Mutex{}, "1", "something", stdlifetime}
+	storage.Set("1", "something")
+	storage.Set("2", "something new")
+	storage.Set("3", "")
 }
 
-//t must be key, or value
-func IsKeyExist(key string) error {
-	s.Lock()
-	defer s.Unlock()
-	for _, s := range storage {
-		if s.isKeyIn(key) {
-			return nil
-		}
+func NewStorage() *Storage {
+	return &Storage {
+		Record: make(map[string]*Record),
+	}
+}
+
+func IsKeyExistReturnErr(key string) error {
+	if storage.isKeyInStorage(key) {
+		return nil
 	}
 	return errors.New("The key doesn't exist")
 }
 
-func IsValueExist(key string) error {
-	s.Lock()
-	defer s.Unlock()
-	for _, s := range storage {
-		if s.isValueIn(key) {
-			return nil
-		}
+func IsValueNotNullReturnErr(key string) error {
+	if storage.isValueInRecordNotNull(key) {
+		return nil
 	}
-	return errors.New("Record doesn't have the value")
+	return errors.New("Record doesn't have a value")
 }
 
-func LifetimeManage() {
-	for {
-		time.Sleep(sleeptimeInSec)
-		for _, s := range storage {
-			if s.isLifetimeZero() {
-				DeleteStorageRecord(s.Key)
-			} else {
-				s.substructLifetimeOne()
-			}
-		}
-	}
-}
-
-func AddStorageRecord(key, value string) error {
-	err := IsKeyExist(key)
-	if err != nil {
+func IsKeyUniqueReturnErr(key string) error {
+	if storage.isValueInRecordNotNull(key) {
 		return errors.New("Record doesn't added (key isn't unique)")
 	}
-	storage[key].setKey(key)
-	storage[key].setValue(value)
-	storage[key].addRecordLifetime()
 	return nil
+}
+
+func SetRecord(key, value string) {
+	IsKeyExistReturnErr(key)
+	storage.Set(key, value)
 }
 
 func AddRecordLifetime(key string) {
-	storage[key].addRecordLifetime()
+	IsKeyExistReturnErr(key)
+	storage.AddRecordLifetime(key)
 }
 
-func ReturnStorageRecord(key string) *Storage {
-	return storage[key]
-}
-
-func ReturnRecordKey(key string) string {
-	return storage[key].Key
+func ReturnStorageRecord(key string) *Record {
+	IsKeyExistReturnErr(key)
+	return storage.GetRecord(key)
 }
 
 func ReturnRecordValue(key string) string {
-	return storage[key].Value
+	return ReturnStorageRecord(key).Value
 }
 
 func DeleteStorageRecord(key string) {
-	delete(storage, key)
+	IsKeyExistReturnErr(key)
+	delete(storage.Record, key)
 }
 
-func ChangeRecordKey(oldKey, newKey string) error {
-	err := AddStorageRecord(newKey, ReturnRecordValue(oldKey))
-	if err != nil {
-		return err
-	}
-	storage[newKey].addRecordLifetime()
-	DeleteStorageRecord(oldKey)
-	return nil
+func IsLifetimeZero(key string) bool {
+	IsKeyExistReturnErr(key)
+	return storage.IsLifetimeZero(key)
 }
 
-func ChangeRecordValue(key, value string) {
-	storage[key].setValue(value)
-	storage[key].addRecordLifetime()
+func SubstructLifetimeOne(key string) {
+	IsKeyExistReturnErr(key)
+	storage.SubstructLifetimeOne(key)
 }
+
+//high-order functions below
 
 //func ReturnStorage() map[string]*Storage {
 //	var
 //}
+
+func AddStorageRecord(key, value string) {
+	IsKeyUniqueReturnErr(key)
+	SetRecord(key, value)
+	AddRecordLifetime(key)
+}
+//
+func ChangeRecordValueReturnError(key, value string) {
+	SetRecord(key, value)
+	AddRecordLifetime(key)
+}
+
+func ChangeRecordKeyReturnErr(oldKey, newKey string) {
+	AddStorageRecord(newKey, ReturnRecordValue(oldKey))
+	AddRecordLifetime(newKey)
+	DeleteStorageRecord(oldKey)
+}
+
+//goroutine
+func LifetimeManage() {
+
+	for {
+		time.Sleep(sleeptimeInSec)
+		for _, s := range storage.Record {
+			SubstructLifetimeOne(s.getRecordKey())
+			if IsLifetimeZero(s.getRecordKey()) {
+				DeleteStorageRecord(s.getRecordKey())
+			}
+		}
+	}
+}

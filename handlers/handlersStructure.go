@@ -5,7 +5,9 @@ import "net/http"
 import "github.com/gorilla/mux"
 import "log"
 import "encoding/json"
-import "errors"
+import (
+	"errors"
+)
 
 type Encoder struct {
 	ErrMessage error `json:"error_message"`
@@ -36,14 +38,14 @@ func (e Encoder) encodeMessage(w http.ResponseWriter) {
 	json.NewEncoder(w).Encode(e.ActMessage)
 }
 
-func HandleEstalish() {
+func HandleEstablish() {
 	r := mux.NewRouter()
 
 	//r.HandleFunc("/all", handlerShowAllRecords)
 	r.HandleFunc("/{key}", handlerShowRecord)
 
-	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerKeySet)
-	r.HandleFunc("/changevalue/{key}/{value}", handlerValueChange)
+	r.HandleFunc("/setkey/{oldKey}/{newKey}", handlerSetKey)
+	r.HandleFunc("/changevalue/{key}/{value}", handlerChangeValue)
 	r.HandleFunc("/delete/{key}", handlerDeleteRecord)
 	r.HandleFunc("/value/{key}", handlerShowValue)
 

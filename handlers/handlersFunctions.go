@@ -12,7 +12,7 @@ import (
 func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
-	err := strg.IsKeyExist(vars["key"])
+	err := strg.IsKeyExistReturnErr(vars["key"])
 	if err != nil {
 		encoder.setError("Key is not exist")
 		encoder.encodeError(w)
@@ -33,7 +33,7 @@ func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
 func handlerShowValue(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
-	err := strg.IsValueExist(vars["key"])
+	err := strg.IsValueNotNullReturnErr(vars["key"])
 	if err != nil {
 		encoder.setError("Value is not exist")
 		encoder.encodeValue(w, vars["value"])
@@ -46,10 +46,10 @@ func handlerShowValue(w http.ResponseWriter, r *http.Request) {
 }
 
 //re
-func handlerKeySet(w http.ResponseWriter, r *http.Request) {
+func handlerSetKey(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
-	err := strg.IsKeyExist("oldKey")
+	err := strg.IsKeyExistReturnErr("oldKey")
 	if err != nil {
 		strg.AddStorageRecord(vars["oldKey"], "")
 		encoder.setMessage("New record seted")
@@ -57,31 +57,31 @@ func handlerKeySet(w http.ResponseWriter, r *http.Request) {
 		log.Println(encoder.ActMessage)
 		return
 	}
-	err = strg.IsKeyExist("newKey")
+	err = strg.IsKeyExistReturnErr("newKey")
 	if err != nil {
 		encoder.setError("New key already in use")
 		encoder.encodeValue(w, vars["key"])
 		log.Println(encoder.ErrMessage)
 		return
 	}
-	strg.ChangeRecordKey(vars["oldKey"], vars["newKey"])
+	strg.ChangeRecordKeyReturnErr(vars["oldKey"], vars["newKey"])
 	encoder.setMessage("Key changed")
 	encoder.encodeMessage(w)
 	log.Println(encoder.ActMessage)
 }
 
-func handlerValueChange(w http.ResponseWriter, r *http.Request) {
+func handlerChangeValue(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
 
-	err := strg.IsKeyExist(vars["key"])
+	err := strg.IsKeyExistReturnErr(vars["key"])
 	if err != nil {
 		encoder.setError("Key is not exist")
 		encoder.encodeError(w)
 		log.Println(encoder.ErrMessage)
 		return
 	}
-	strg.ChangeRecordValue(vars["key"], vars["value"])
+	strg.ChangeRecordValueReturnError(vars["key"], vars["value"])
 	encoder.setMessage("Value of " + vars["key"] + " changed")
 	encoder.encodeMessage(w)
 	log.Println(encoder.ActMessage)
@@ -92,7 +92,7 @@ func handlerDeleteRecord(w http.ResponseWriter, r *http.Request) {
 	var encoder Encoder
 	vars := mux.Vars(r)
 
-	err := strg.IsValueExist(vars["key"])
+	err := strg.IsValueNotNullReturnErr(vars["key"])
 	if err != nil {
 		encoder.setError("Record doesn't have a value")
 		encoder.encodeError(w)
