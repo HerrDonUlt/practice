@@ -1,31 +1,25 @@
 package handlers
 
 import (
-"encoding/json"
-"log"
-"net/http"
+	"encoding/json"
+	"log"
+	"net/http"
 
-"github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"practicegit/storage"
-	"sync"
 )
 
 var strg *storage.Storage
 
 func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
-	mutex := sync.Mutex{}
-	mutex.Lock()
 	vars := mux.Vars(r)
 	record := strg.GetRecord(vars["key"])
 	json.NewEncoder(w).Encode(record)
 	log.Println("Record " + vars["key"] + " showed")
-	mutex.Unlock()
 }
 
 
 func handlerShowAllRecords(w http.ResponseWriter, r *http.Request) {
-	mutex := sync.Mutex{}
-	mutex.Lock()
 	records := strg.GetAllRecord()
 	for _, s := range records {
 
@@ -33,7 +27,6 @@ func handlerShowAllRecords(w http.ResponseWriter, r *http.Request) {
 
 	}
 	log.Println("showed all records")
-	mutex.Unlock()
 }
 //
 //func HandlerShowValue(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +101,7 @@ func InitHandlers(storage *storage.Storage) {
 	r := mux.NewRouter()
 	strg = storage
 
-	r.HandleFunc("/all", handlerShowAllRecords)
+	//r.HandleFunc("/all", handlerShowAllRecords)
 	r.HandleFunc("/{key}", handlerShowRecord)
 
 	//r.HandleFunc("/setKey/{oldKey}/{newKey}", HandlerSetKey)

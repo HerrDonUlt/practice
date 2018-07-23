@@ -21,6 +21,7 @@ func NewStorage() *Storage {
 
 func LifetimeManage(storage *Storage) {
 	for {
+		
 		time.Sleep(sleeptimeInSec)
 		storage.DeleteNullStorageRecords()
 		storage.SubstructLifetimeRecords()

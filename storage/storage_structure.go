@@ -36,8 +36,8 @@ func (r *Record) IsValueInRecordNotNull(key string) bool {
 }
 
 func (s *Storage) GetRecord(key string) *Record {
-	s.mux.RLock()
-	defer s.mux.RUnlock()
+	s.mux.Lock()
+	defer s.mux.Unlock()
 	return s.records[key]
 }
 
@@ -61,13 +61,16 @@ func (r *Record) getRecordKey() string {
 	return r.Key
 }
 
+func (s *Storage) substructLifetime(r *Record) {
+	r.LifeTime -= 1
+}
+
 func (s *Storage) SubstructLifetimeRecords() {
 	s.mux.Lock()
-	defer s.mux.Unlock()
 	for _, r := range s.records {
-		r.LifeTime -= 1
+		s.substructLifetime(r)
 	}
-	return
+	s.mux.Unlock()
 }
 
 func (s *Storage) DeleteNullStorageRecords() {
