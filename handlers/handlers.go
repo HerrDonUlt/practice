@@ -9,18 +9,15 @@ import (
 	"practicegit/storage"
 )
 
-var strg *storage.Storage
-
 func handlerShowRecord(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	record := strg.GetRecord(vars["key"])
+	record := storage.Strg.GetRecord(vars["key"])
 	json.NewEncoder(w).Encode(record)
 	log.Println("Record " + vars["key"] + " showed")
 }
 
-
 func handlerShowAllRecords(w http.ResponseWriter, r *http.Request) {
-	records := strg.GetAllRecord()
+	records := storage.Strg.GetAllRecord()
 	for _, s := range records {
 
 		json.NewEncoder(w).Encode(s)
@@ -28,6 +25,7 @@ func handlerShowAllRecords(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("showed all records")
 }
+
 //
 //func HandlerShowValue(w http.ResponseWriter, r *http.Request) {
 //	vars := mux.Vars(r)
@@ -97,10 +95,8 @@ func handlerShowAllRecords(w http.ResponseWriter, r *http.Request) {
 //	log.Println(encoder.ActMessage)
 //}
 
-func InitHandlers(storage *storage.Storage) {
+func InitHandlersAndStartServe() {
 	r := mux.NewRouter()
-	strg = storage
-
 	//r.HandleFunc("/all", handlerShowAllRecords)
 	r.HandleFunc("/{key}", handlerShowRecord)
 
