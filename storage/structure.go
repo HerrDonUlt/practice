@@ -83,5 +83,4 @@ func (s Storage) DeleteNullStorageRecords() {
 			delete(s.records, r.Key)
 		}
 	}
-	return
 }
