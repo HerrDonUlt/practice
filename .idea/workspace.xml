@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21f1bc2e-5e50-48c4-a481-fa300ab3093b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/storage_functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/storage/functions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/storage_structure.go" beforeDir="false" afterPath="$PROJECT_DIR$/storage/structure.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/storage/functions.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/structure.go" beforeDir="false" afterPath="$PROJECT_DIR$/storage/structure.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,23 +16,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+            <state relative-caret-position="264">
+              <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
               <folding>
-                <element signature="e#14#82#0" expanded="true" />
+                <element signature="e#14#80#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="structure.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="structure.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/storage/structure.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2171">
-              <caret line="84" column="5" selection-start-line="84" selection-start-column="5" selection-end-line="84" selection-end-column="5" />
+            <state relative-caret-position="1320">
+              <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="23" />
               <folding>
                 <element signature="e#17#42#0" expanded="true" />
               </folding>
@@ -43,8 +43,8 @@
       <file leaf-file-name="functions.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/storage/functions.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="15" column="42" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
+            <state relative-caret-position="264">
+              <caret line="8" column="24" lean-forward="true" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
               <folding>
                 <element signature="e#17#35#0" expanded="true" />
               </folding>
@@ -55,8 +55,8 @@
       <file leaf-file-name="handlers.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/handlers/handlers.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2402">
-              <caret line="95" column="3" lean-forward="true" selection-start-line="95" selection-start-column="3" selection-end-line="95" selection-end-column="3" />
+            <state relative-caret-position="-186">
+              <caret line="63" lean-forward="true" selection-start-line="63" selection-end-line="63" />
               <folding>
                 <element signature="e#19#88#0" expanded="true" />
               </folding>
@@ -79,7 +79,11 @@
       <find>p</find>
       <find>Record</find>
       <find>GetRecordValue</find>
+      <find>s.</find>
     </findStrings>
+    <replaceStrings>
+      <replace>storage.</replace>
+    </replaceStrings>
   </component>
   <component name="GOROOT" path="c:\Go" />
   <component name="Git.Settings">
@@ -104,9 +108,11 @@
         <option value="$PROJECT_DIR$/handlers/handlers_functions.go" />
         <option value="$PROJECT_DIR$/handlers.go" />
         <option value="$PROJECT_DIR$/storage/storage_functions.go" />
-        <option value="$PROJECT_DIR$/handlers/handlers.go" />
         <option value="$PROJECT_DIR$/storage/storage_structure.go" />
         <option value="$PROJECT_DIR$/main.go" />
+        <option value="$PROJECT_DIR$/storage/functions.go" />
+        <option value="$PROJECT_DIR$/handlers/handlers.go" />
+        <option value="$PROJECT_DIR$/storage/structure.go" />
       </list>
     </option>
   </component>
@@ -215,12 +221,12 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build RecordStructure.go">
-    <configuration name="go build RecordStructure.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build practicegit">
+    <configuration name="go build practicegit" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="practicegit" />
       <working_directory value="$PROJECT_DIR$/" />
-      <go_parameters value="-i" />
-      <kind value="FILE" />
+      <go_parameters value="-i -race" />
+      <kind value="DIRECTORY" />
       <filePath value="$PROJECT_DIR$/storage/RecordStructure.go" />
       <package value="practicegit" />
       <directory value="$PROJECT_DIR$/" />
@@ -236,11 +242,11 @@
     </configuration>
     <list>
       <item itemvalue="Go Build.go build test.go" />
-      <item itemvalue="Go Build.go build RecordStructure.go" />
+      <item itemvalue="Go Build.go build practicegit" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build RecordStructure.go" />
+        <item itemvalue="Go Build.go build practicegit" />
         <item itemvalue="Go Build.go build test.go" />
       </list>
     </recent_temporary>
@@ -251,12 +257,12 @@
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2746032" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50079364" side_tool="true" weight="0.2950644" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.638412" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32624868" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49920633" weight="0.25" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -306,7 +312,7 @@
         <state>
           <caret column="12" selection-start-column="12" selection-end-column="12" />
           <folding>
-            <element signature="e#14#82#0" expanded="true" />
+            <element signature="e#14#80#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -343,7 +349,7 @@
         <state relative-caret-position="264">
           <caret line="8" column="8" selection-start-line="8" selection-start-column="8" selection-end-line="8" selection-end-column="8" />
           <folding>
-            <element signature="e#14#82#0" expanded="true" />
+            <element signature="e#14#80#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -430,10 +436,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://C:/Go/src/net/http/server.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1001">
+          <caret line="2659" column="11" selection-start-line="2659" selection-start-column="11" selection-end-line="2659" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Go/src/runtime/hashmap_fast.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-297">
+          <caret line="597" selection-start-line="597" selection-end-line="597" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+          <folding>
+            <element signature="e#14#80#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/storage/functions.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="8" column="24" lean-forward="true" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+          <folding>
+            <element signature="e#17#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/handlers/handlers.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2402">
-          <caret line="95" column="3" lean-forward="true" selection-start-line="95" selection-start-column="3" selection-end-line="95" selection-end-column="3" />
+        <state relative-caret-position="-186">
+          <caret line="63" lean-forward="true" selection-start-line="63" selection-end-line="63" />
           <folding>
             <element signature="e#19#88#0" expanded="true" />
           </folding>
@@ -442,30 +482,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/storage/structure.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2171">
-          <caret line="84" column="5" selection-start-line="84" selection-start-column="5" selection-end-line="84" selection-end-column="5" />
+        <state relative-caret-position="1320">
+          <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="23" />
           <folding>
             <element signature="e#17#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/storage/functions.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="15" column="42" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
-          <folding>
-            <element signature="e#17#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding>
-            <element signature="e#14#82#0" expanded="true" />
           </folding>
         </state>
       </provider>
