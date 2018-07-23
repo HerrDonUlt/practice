@@ -1,6 +1,10 @@
 package storage
 
-import "sync"
+import (
+	"sync"
+)
+
+const stdlifetime int = 3
 
 type Record struct {
 	Key      string `json:"key"`
@@ -37,30 +41,42 @@ func (s *Storage) GetRecord(key string) *Record {
 	return s.records[key]
 }
 
+func (s *Storage) GetAllRecord() map[string]*Record {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+	return s.records
+}
+
 func (s *Storage) SetRecord(key, value string) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	s.records[key].Key = key
-	s.records[key].Value = value
+	s.records[key] = &Record{Key:key, Value:value, LifeTime:stdlifetime}
 }
 
-func (r *Record) GetRecordValue() string {
+func (r *Record) getRecordValue() string {
 	return r.Value
 }
 
-func (r *Record) IsRecordLifetimeZero() bool {
-	if r.LifeTime == 0 {
-		return true
-	}
-	return false
+func (r *Record) getRecordKey() string {
+	return r.Key
 }
 
-func (s *Storage) SubstructLifetimeOne(key string) {
+func (s *Storage) SubstructLifetimeRecords() {
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	s.records[key].LifeTime -= 1
+	for _, r := range s.records {
+		r.LifeTime -= 1
+	}
+	return
 }
 
-func (s *Storage) DeleteStorageRecord(r *Record) {
-	delete(s.records, r.Key)
+func (s *Storage) DeleteNullStorageRecords() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	for _, r := range s.records {
+		if r.LifeTime == 0 {
+			delete(s.records, r.Key)
+		}
+	}
+	return
 }

@@ -15,21 +15,14 @@ func initTestStorage(s *Storage) {
 func NewStorage() *Storage {
 	s := &Storage{records: make(map[string]*Record)}
 	initTestStorage(s)
-	go LifetimeManage(s)
+
 	return s
 }
 
 func LifetimeManage(storage *Storage) {
 	for {
 		time.Sleep(sleeptimeInSec)
-		for _, s := range storage.records {
-			if s.IsRecordLifetimeZero() {
-				storage.DeleteStorageRecord(s)
-			}
-		}
+		storage.DeleteNullStorageRecords()
+		storage.SubstructLifetimeRecords()
 	}
-}
-
-func IsKeyInStorage(storage *Storage, key string) bool {
-	return storage.IsKeyInStorage(key)
 }
